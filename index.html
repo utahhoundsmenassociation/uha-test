@@ -315,11 +315,13 @@ function submitForm(){
   // Absolute failsafe — button always re-enables after 5s no matter what
   const failsafe=setTimeout(()=>{
     btn.disabled=false;btn.textContent='✓ Submit Registration';
-    showMsg('Timed out — entry saved to queue. Tap "Send Now" in the queue banner.','queued');
-    queue.push(entry);saveQueue();updateQBanner();renderQueueDetail();
-    recent.unshift({...entry,_sent:false});
-    localStorage.setItem(RECENT_KEY,JSON.stringify(recent));
-    clearForm();
+    if(!alreadySent(entry.id)){
+      queue.push(entry);saveQueue();updateQBanner();renderQueueDetail();
+      showMsg('Timed out — entry saved to queue. Tap "Send Now" in the queue banner.','queued');
+      recent.unshift({...entry,_sent:false});
+      localStorage.setItem(RECENT_KEY,JSON.stringify(recent));
+      clearForm();
+    }
   },5000);
 
   sendEntry(entry).then(ok=>{
@@ -327,73 +329,91 @@ function submitForm(){
     btn.disabled=false;btn.textContent='✓ Submit Registration';
     if(ok){
       showMsg(`✓ ${first} ${last} registered and sent!`,'ok');
-    } else {
+    } else if(!alreadySent(entry.id)){
       queue.push(entry);saveQueue();updateQBanner();renderQueueDetail();
       showMsg(`Saved — will send automatically when connected.`,'queued');
     }
-    recent.unshift({...entry,_sent:ok});
-    if(recent.length>30)recent.pop();
-    localStorage.setItem(RECENT_KEY,JSON.stringify(recent));
+    if(!recent.find(r=>r.id===entry.id)){
+      recent.unshift({...entry,_sent:ok});
+      if(recent.length>30)recent.pop();
+      localStorage.setItem(RECENT_KEY,JSON.stringify(recent));
+    }
     clearForm();
   }).catch(()=>{
     clearTimeout(failsafe);
     btn.disabled=false;btn.textContent='✓ Submit Registration';
-    queue.push(entry);saveQueue();updateQBanner();renderQueueDetail();
-    showMsg(`Saved locally — will send when connected.`,'queued');
-    recent.unshift({...entry,_sent:false});
-    localStorage.setItem(RECENT_KEY,JSON.stringify(recent));
+    if(!alreadySent(entry.id)){
+      queue.push(entry);saveQueue();updateQBanner();renderQueueDetail();
+      showMsg(`Saved locally — will send when connected.`,'queued');
+      recent.unshift({...entry,_sent:false});
+      localStorage.setItem(RECENT_KEY,JSON.stringify(recent));
+    }
     clearForm();
   });
 }
 
+// Tracks submission IDs already sent this session — prevents double-sends
+const SENT_KEY='uha_sent_ids';
+function getSentIds(){try{return new Set(JSON.parse(localStorage.getItem(SENT_KEY)||'[]'));}catch{return new Set();}}
+function markSent(id){try{const ids=getSentIds();ids.add(id);localStorage.setItem(SENT_KEY,JSON.stringify([...ids].slice(-200)));}catch{}}
+function alreadySent(id){return getSentIds().has(id);}
+
 function sendEntry(entry){
-  // Always complete within 2 seconds — never leave the button frozen
+  // If this ID was already successfully sent, skip silently
+  if(alreadySent(entry.id)) return Promise.resolve(true);
+
   return new Promise(resolve=>{
-    // Safety net: resolve after 2s no matter what
-    const timeout=setTimeout(()=>resolve(false), 2000);
-
-    // No URL configured → queue it
-    if(!scriptUrl){
-      clearTimeout(timeout);
-      return resolve(false);
+    let resolved=false;
+    function done(ok){
+      if(resolved)return;
+      resolved=true;
+      if(ok) markSent(entry.id); // record as sent so it never fires again
+      document.getElementById('connDot').className=ok?'conn-dot online':'conn-dot';
+      resolve(ok);
     }
 
-    // Offline → queue it
-    if(!navigator.onLine){
-      clearTimeout(timeout);
-      return resolve(false);
-    }
+    // Hard timeout — if fetch doesn't respond in 8s, treat as failed (will queue)
+    const timeout=setTimeout(()=>done(false), 8000);
+
+    if(!scriptUrl){clearTimeout(timeout);return done(false);}
+    if(!navigator.onLine){clearTimeout(timeout);return done(false);}
 
     document.getElementById('connDot').className='conn-dot sending';
 
-    // Fire-and-forget POST to Apps Script
-    // text/plain avoids CORS preflight; Apps Script receives the body fine
     fetch(scriptUrl,{
       method:'POST',
       mode:'no-cors',
       headers:{'Content-Type':'text/plain'},
       body:JSON.stringify(entry)
     }).then(()=>{
-      document.getElementById('connDot').className='conn-dot online';
       clearTimeout(timeout);
-      resolve(true);
+      done(true);
     }).catch(()=>{
-      document.getElementById('connDot').className='conn-dot';
       clearTimeout(timeout);
-      resolve(false);
+      done(false);
     });
   });
 }
 
-function saveQueue(){localStorage.setItem(QUEUE_KEY,JSON.stringify(queue));}
+function saveQueue(){
+  // Before saving, remove anything already marked sent
+  queue=queue.filter(e=>!alreadySent(e.id));
+  localStorage.setItem(QUEUE_KEY,JSON.stringify(queue));
+}
 function updateQBanner(){const b=document.getElementById('qBanner'),c=document.getElementById('qCount');if(queue.length){b.classList.remove('hidden');c.textContent=`${queue.length} entr${queue.length===1?'y':'ies'} queued`;}else b.classList.add('hidden');}
 function flushQueue(){
   if(!queue.length||!scriptUrl||!navigator.onLine)return;
-  const send=[...queue];queue=[];saveQueue();updateQBanner();renderQueueDetail();
+  // Filter out anything already sent before attempting
+  queue=queue.filter(e=>!alreadySent(e.id));
+  saveQueue();
+  if(!queue.length){updateQBanner();return;}
+  const send=[...queue];
+  // Clear queue optimistically — failures will be re-added
+  queue=[];saveQueue();updateQBanner();renderQueueDetail();
   Promise.all(send.map(e=>sendEntry(e))).then(res=>{
-    const failed=send.filter((_,i)=>!res[i]);
+    const failed=send.filter((_,i)=>!res[i]&&!alreadySent(send[i].id));
     if(failed.length){queue=[...queue,...failed];saveQueue();updateQBanner();renderQueueDetail();}
-    else showMsg(`✓ ${send.length} queued entr${send.length===1?'y':'ies'} sent!`,'ok');
+    else if(send.length) showMsg(`✓ ${send.length} queued entr${send.length===1?'y':'ies'} sent!`,'ok');
   });
 }
 function clearQueue(){if(confirm('Clear all queued entries?')){queue=[];saveQueue();updateQBanner();renderQueueDetail();}}
