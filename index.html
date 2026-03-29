@@ -312,58 +312,76 @@ function submitForm(){
   const btn=document.getElementById('submitBtn');
   btn.disabled=true;btn.textContent='Submitting...';
 
+  // Absolute failsafe — button always re-enables after 5s no matter what
+  const failsafe=setTimeout(()=>{
+    btn.disabled=false;btn.textContent='✓ Submit Registration';
+    showMsg('Timed out — entry saved to queue. Tap "Send Now" in the queue banner.','queued');
+    queue.push(entry);saveQueue();updateQBanner();renderQueueDetail();
+    recent.unshift({...entry,_sent:false});
+    localStorage.setItem(RECENT_KEY,JSON.stringify(recent));
+    clearForm();
+  },5000);
+
   sendEntry(entry).then(ok=>{
+    clearTimeout(failsafe);
     btn.disabled=false;btn.textContent='✓ Submit Registration';
     if(ok){
       showMsg(`✓ ${first} ${last} registered and sent!`,'ok');
     } else {
       queue.push(entry);saveQueue();updateQBanner();renderQueueDetail();
-      showMsg(`📤 Saved locally — will send when WiFi returns.`,'queued');
+      showMsg(`Saved — will send automatically when connected.`,'queued');
     }
     recent.unshift({...entry,_sent:ok});
     if(recent.length>30)recent.pop();
     localStorage.setItem(RECENT_KEY,JSON.stringify(recent));
     clearForm();
+  }).catch(()=>{
+    clearTimeout(failsafe);
+    btn.disabled=false;btn.textContent='✓ Submit Registration';
+    queue.push(entry);saveQueue();updateQBanner();renderQueueDetail();
+    showMsg(`Saved locally — will send when connected.`,'queued');
+    recent.unshift({...entry,_sent:false});
+    localStorage.setItem(RECENT_KEY,JSON.stringify(recent));
+    clearForm();
   });
 }
 
-// ── HOW SUBMISSION WORKS ───────────────────────────────────────────────────────
-// Google Apps Script cannot return CORS headers to a browser fetch, so we can
-// never confirm receipt from the client side. The reliable pattern is:
-//   1. Save the entry to the local queue immediately (guaranteed safe)
-//   2. Fire a no-cors fetch in the background (Apps Script receives it fine)
-//   3. Mark as "sent" optimistically — if it failed, the user can retry via queue
-//   4. The offline queue retries automatically every 45 seconds when online
-
 function sendEntry(entry){
-  // Always queue first so nothing is lost
-  if(!S_sent) S_sent={};
-  const key=entry.id;
-
-  // If no URL configured or offline, stay in queue
-  if(!scriptUrl||!navigator.onLine){
-    return Promise.resolve(false);
-  }
-
-  document.getElementById('connDot').className='conn-dot sending';
-
-  // Fire no-cors fetch — Apps Script receives POST data fine,
-  // we just can't read the response (that's OK, we don't need to)
-  fetch(scriptUrl, {
-    method:'POST',
-    mode:'no-cors',
-    headers:{'Content-Type':'text/plain'},  // text/plain avoids preflight
-    body:JSON.stringify(entry)
-  }).then(()=>{
-    document.getElementById('connDot').className='conn-dot online';
-  }).catch(()=>{
-    document.getElementById('connDot').className='conn-dot';
-  });
-
-  // Optimistically return true after a short delay
-  // (the fetch is fire-and-forget but Apps Script will process it)
+  // Always complete within 2 seconds — never leave the button frozen
   return new Promise(resolve=>{
-    setTimeout(()=>resolve(true), 1500);
+    // Safety net: resolve after 2s no matter what
+    const timeout=setTimeout(()=>resolve(false), 2000);
+
+    // No URL configured → queue it
+    if(!scriptUrl){
+      clearTimeout(timeout);
+      return resolve(false);
+    }
+
+    // Offline → queue it
+    if(!navigator.onLine){
+      clearTimeout(timeout);
+      return resolve(false);
+    }
+
+    document.getElementById('connDot').className='conn-dot sending';
+
+    // Fire-and-forget POST to Apps Script
+    // text/plain avoids CORS preflight; Apps Script receives the body fine
+    fetch(scriptUrl,{
+      method:'POST',
+      mode:'no-cors',
+      headers:{'Content-Type':'text/plain'},
+      body:JSON.stringify(entry)
+    }).then(()=>{
+      document.getElementById('connDot').className='conn-dot online';
+      clearTimeout(timeout);
+      resolve(true);
+    }).catch(()=>{
+      document.getElementById('connDot').className='conn-dot';
+      clearTimeout(timeout);
+      resolve(false);
+    });
   });
 }
 
