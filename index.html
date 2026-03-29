@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>UHA Field Trials — Sign Up</title>
+<style>
+:root{--bg:#0f1117;--bg2:#1a1d27;--bg3:#222638;--card:#1e2130;--border:rgba(255,255,255,0.12);--border2:rgba(255,255,255,0.22);--text:#e8eaf0;--text2:#9ca3af;--text3:#6b7280;--accent:#f59e0b;--accent2:#d97706;--green:#10b981;--red:#ef4444;--blue:#3b82f6;--purple:#8b5cf6;--r:12px;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,Georgia,serif;min-height:100vh;padding-bottom:60px;}
+.hdr{background:var(--bg2);border-bottom:3px solid var(--accent);padding:14px 18px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:50;}
+.logo{font-size:19px;font-weight:800;color:var(--accent);}
+.logo span{font-size:12px;font-weight:400;color:var(--text2);display:block;margin-top:1px;}
+.conn{display:flex;align-items:center;gap:6px;margin-left:auto;}
+.conn-dot{width:11px;height:11px;border-radius:50%;background:var(--text3);transition:all .4s;flex-shrink:0;}
+.conn-dot.online{background:var(--green);box-shadow:0 0 7px var(--green);}
+.conn-dot.sending{background:var(--accent);box-shadow:0 0 7px var(--accent);animation:pulse 1s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.5;}}
+.conn-lbl{font-size:11px;color:var(--text2);}
+.tabs{display:flex;background:var(--bg2);border-bottom:1px solid var(--border);padding:0 18px;}
+.tab{padding:12px 18px;font-size:13px;font-weight:600;color:var(--text2);cursor:pointer;border-bottom:3px solid transparent;transition:all .15s;font-family:inherit;background:none;border-top:none;border-left:none;border-right:none;}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
+.wrap{max-width:760px;margin:0 auto;padding:18px;}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:18px;margin-bottom:16px;}
+.card-title{font-size:15px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.shdr{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--accent);margin:14px 0 8px;padding-bottom:5px;border-bottom:1px solid rgba(245,158,11,.2);}
+.row{display:flex;gap:12px;margin-bottom:12px;flex-wrap:wrap;}
+.fg{display:flex;flex-direction:column;gap:5px;flex:1;min-width:140px;}
+.fg.full{min-width:100%;}
+.fg label{font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;font-weight:600;}
+input.fi,select.fi,textarea.fi{background:var(--bg3);border:1.5px solid var(--border2);color:var(--text);padding:13px 14px;border-radius:10px;font-size:16px;font-family:inherit;outline:none;transition:border .15s;width:100%;}
+input.fi:focus,select.fi:focus,textarea.fi:focus{border-color:var(--accent);}
+input.fi::placeholder,textarea.fi::placeholder{color:var(--text3);}
+textarea.fi{min-height:70px;resize:vertical;font-size:15px;}
+.check-grid{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:4px;}
+.chk{display:flex;align-items:center;gap:7px;background:var(--bg3);border:1.5px solid var(--border);border-radius:24px;padding:10px 16px;cursor:pointer;font-size:14px;transition:all .15s;user-select:none;-webkit-user-select:none;}
+.chk:active{transform:scale(.96);}
+.chk.on{border-color:var(--accent);background:rgba(245,158,11,.12);color:var(--accent);}
+.chk input{display:none;}
+.dog-block{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px;position:relative;}
+.dog-num{position:absolute;top:10px;right:12px;font-size:10px;font-weight:700;color:var(--text3);background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:2px 8px;}
+.dog-events{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
+.dog-ev{display:flex;align-items:center;gap:5px;background:var(--bg2);border:1.5px solid var(--border);border-radius:6px;padding:8px 12px;cursor:pointer;font-size:13px;transition:all .15s;user-select:none;-webkit-user-select:none;}
+.dog-ev:active{transform:scale(.96);}
+.dog-ev.on{border-color:var(--accent);background:rgba(245,158,11,.1);color:var(--accent);font-weight:600;}
+.dog-ev input{display:none;}
+.pack-block{background:var(--bg3);border:1.5px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px;transition:border-color .2s;}
+.pack-block.filled{border-color:rgba(139,92,246,.45);}
+.btn-primary{width:100%;padding:17px;border-radius:12px;border:none;background:var(--accent);color:#000;font-size:18px;font-weight:800;font-family:inherit;cursor:pointer;transition:all .15s;margin-top:4px;}
+.btn-primary:active{background:var(--accent2);transform:scale(.99);}
+.btn-primary:disabled{opacity:.45;cursor:not-allowed;transform:none;}
+.btn-sm{padding:8px 16px;border-radius:8px;border:1px solid var(--border2);background:var(--bg3);color:var(--text);font-size:13px;font-family:inherit;font-weight:600;cursor:pointer;transition:opacity .15s;}
+.btn-sm:active{opacity:.7;}
+.btn-danger{border-color:rgba(239,68,68,.4);color:var(--red);background:rgba(239,68,68,.08);}
+.msg{padding:14px 16px;border-radius:var(--r);font-size:14px;font-weight:600;margin-bottom:14px;text-align:center;display:none;}
+.msg.ok{background:rgba(16,185,129,.15);color:var(--green);border:1px solid rgba(16,185,129,.35);}
+.msg.err{background:rgba(239,68,68,.15);color:var(--red);border:1px solid rgba(239,68,68,.35);}
+.msg.queued{background:rgba(245,158,11,.15);color:var(--accent);border:1px solid rgba(245,158,11,.35);}
+.q-banner{background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3);border-radius:var(--r);padding:11px 15px;margin-bottom:14px;display:flex;align-items:center;gap:10px;font-size:13px;color:var(--accent);}
+.q-banner.hidden{display:none;}
+.cost-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px;}
+.cost-row:last-child{border-bottom:none;}
+.cost-total{display:flex;justify-content:space-between;padding:10px 0 0;font-size:16px;font-weight:700;color:var(--accent);}
+.recent-item{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:11px 14px;margin-bottom:8px;display:flex;align-items:flex-start;gap:10px;}
+.rdot{width:9px;height:9px;border-radius:50%;background:var(--green);flex-shrink:0;margin-top:5px;}
+.rdot.pend{background:var(--accent);}
+::-webkit-scrollbar{width:4px;} ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
+</style>
+</head>
+<body>
+<div class="hdr">
+  <div class="logo">🐾 UHA Field Trials <span>Day-of Registration</span></div>
+  <div class="conn">
+    <div class="conn-lbl" id="connLbl">Checking...</div>
+    <div class="conn-dot" id="connDot"></div>
+  </div>
+</div>
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('register',this)">📋 Register</button>
+  <button class="tab" onclick="switchTab('recent',this)">✅ Submitted</button>
+  <button class="tab" onclick="switchTab('setup',this)">⚙️ Setup</button>
+</div>
+<div class="wrap" style="padding-bottom:0;">
+  <div class="q-banner hidden" id="qBanner">
+    <span style="font-size:20px;">📤</span>
+    <div style="flex:1;"><div style="font-weight:700;" id="qCount">0 queued</div><div style="font-size:11px;opacity:.8;">Will send when WiFi returns</div></div>
+    <button class="btn-sm" onclick="flushQueue()">Send Now</button>
+  </div>
+  <div class="msg" id="msg"></div>
+</div>
+
+<!-- REGISTER TAB -->
+<div id="tab-register" class="tab-panel active"><div class="wrap">
+
+<div class="card">
+  <div class="card-title">👤 Handler / Owner Information</div>
+  <div class="row">
+    <div class="fg"><label>First Name *</label><input class="fi" id="f-first" placeholder="First name" autocomplete="given-name"></div>
+    <div class="fg"><label>Last Name *</label><input class="fi" id="f-last" placeholder="Last name" autocomplete="family-name"></div>
+  </div>
+  <div class="row">
+    <div class="fg full"><label>Street Address</label><input class="fi" id="f-street" placeholder="Street address" autocomplete="street-address"></div>
+  </div>
+  <div class="row">
+    <div class="fg"><label>City</label><input class="fi" id="f-city" placeholder="City" autocomplete="address-level2"></div>
+    <div class="fg" style="max-width:90px;"><label>State</label><input class="fi" id="f-state" placeholder="UT" maxlength="2"></div>
+    <div class="fg" style="max-width:120px;"><label>Zip</label><input class="fi" id="f-zip" placeholder="84000" type="number" inputmode="numeric"></div>
+  </div>
+  <div class="row">
+    <div class="fg"><label>Email</label><input class="fi" id="f-email" placeholder="email@example.com" type="email" inputmode="email"></div>
+    <div class="fg"><label>Phone *</label><input class="fi" id="f-phone" placeholder="(801) 555-0000" type="tel" inputmode="tel"></div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-title">🎟️ Membership & Raffle</div>
+  <div style="font-size:13px;color:var(--text2);margin-bottom:10px;line-height:1.6;"><strong style="color:var(--text);">UHA Membership — $35</strong> includes a UHA hat. Skip if you attended the March banquet.</div>
+  <div class="check-grid" style="margin-bottom:14px;">
+    <label class="chk" id="chk-member" onclick="toggleChk(this);calcCost()"><input type="checkbox" id="f-member"> ✓ Yes — $35 Membership</label>
+  </div>
+  <div style="font-size:13px;color:var(--text2);margin-bottom:6px;line-height:1.5;"><strong style="color:var(--text);">Grand Prize Raffle</strong> — Garmin TT25 Collar + Long-Range Antenna<br>1–4 tickets: $25 each &nbsp;·&nbsp; 5+ tickets: $20 each</div>
+  <div class="row" style="margin-bottom:14px;">
+    <div class="fg" style="max-width:200px;"><label>Grand Prize Ticket Qty</label><input class="fi" id="f-grand" placeholder="0" type="number" inputmode="numeric" min="0" oninput="calcCost()"></div>
+  </div>
+  <div style="font-size:13px;color:var(--text2);margin-bottom:6px;"><strong style="color:var(--text);">General Raffle</strong> — $25 per bundle of 5 tickets</div>
+  <div class="row">
+    <div class="fg" style="max-width:200px;"><label>General Raffle Bundles</label><input class="fi" id="f-general" placeholder="0" type="number" inputmode="numeric" min="0" oninput="calcCost()"></div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-title">🐻 Five Dog Bear Pack &nbsp;<span style="font-size:12px;font-weight:400;color:var(--text2);">$75 per pack</span></div>
+  <div style="font-size:13px;color:var(--text2);margin-bottom:12px;line-height:1.5;">All 5 dogs must cross and tree to qualify. Fastest time wins. Register up to 5 packs.</div>
+  <div id="pack-list"></div>
+  <button class="btn-sm" onclick="addPack()" id="addPackBtn">+ Register a Bear Pack</button>
+</div>
+
+<div class="card">
+  <div class="card-title">🐕 Dog Registration &nbsp;<span style="font-size:12px;font-weight:400;color:var(--text2);">$10/class · Treeing $25 · Bear Drag $30</span></div>
+  <div style="font-size:12px;color:var(--text2);margin-bottom:10px;line-height:1.7;">
+    <strong style="color:var(--text);">Puppy</strong> — under 1 yr &nbsp;|&nbsp; <strong style="color:var(--text);">Junior</strong> — never trophied in UHA &nbsp;|&nbsp; <strong style="color:var(--text);">Senior</strong> — any dog<br>
+    <strong style="color:var(--text);">Over the Hill</strong> — 8+ yrs &nbsp;|&nbsp; <strong style="color:var(--text);">Youth/Female</strong> — under 16, female, or MOH approved<br>
+    <strong style="color:var(--text);">Treeing</strong> — barks in 60 sec &nbsp;|&nbsp; <strong style="color:var(--text);">Iron Dog</strong> — last in circle, 50/50 &nbsp;|&nbsp; <strong style="color:var(--text);">Bear Drag</strong> — 50/50
+  </div>
+  <div id="dog-list"></div>
+  <button class="btn-sm" onclick="addDog()" id="addDogBtn">+ Add Another Dog</button>
+</div>
+
+<div class="card" id="cost-card" style="display:none;">
+  <div class="card-title">💰 Estimated Cost</div>
+  <div id="cost-lines"></div>
+  <div class="cost-total"><span>Total Due</span><span id="cost-total">$0</span></div>
+  <div style="font-size:11px;color:var(--text3);margin-top:6px;">Confirmed at registration table.</div>
+</div>
+
+<div class="card">
+  <div class="card-title">📝 Notes</div>
+  <textarea class="fi" id="f-notes" placeholder="Special requests, additional info..."></textarea>
+</div>
+
+<button class="btn-primary" id="submitBtn" onclick="submitForm()">✓ Submit Registration</button>
+</div></div>
+
+<!-- RECENT TAB -->
+<div id="tab-recent" class="tab-panel"><div class="wrap">
+  <div class="card">
+    <div class="card-title">Submitted Today <span id="recent-count" style="font-size:12px;background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:2px 9px;font-weight:400;color:var(--text2);">0</span>
+      <button class="btn-sm btn-danger" onclick="clearRecent()" style="margin-left:auto;font-size:12px;">Clear List</button>
+    </div>
+    <div id="recent-list"><p style="color:var(--text2);font-size:13px;">No registrations yet today.</p></div>
+  </div>
+</div></div>
+
+<!-- SETUP TAB -->
+<div id="tab-setup" class="tab-panel"><div class="wrap">
+  <div class="card">
+    <div class="card-title">⚙️ Google Sheets Connection</div>
+    <div style="font-size:13px;color:var(--text2);margin-bottom:12px;line-height:1.6;">Registrations post to Google Sheets automatically when online. When offline, they queue and send when WiFi returns.</div>
+    <div class="fg" style="margin-bottom:12px;">
+      <label>Apps Script Web App URL</label>
+      <input class="fi" id="su-url" placeholder="https://script.google.com/macros/s/.../exec" style="font-size:13px;font-family:monospace;" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      <button class="btn-sm" onclick="saveUrl()" style="background:var(--accent);color:#000;border-color:var(--accent);font-weight:700;">Save URL</button>
+      <button class="btn-sm" onclick="testConn()">Test Connection</button>
+    </div>
+    <div id="url-msg" style="margin-top:10px;font-size:12px;color:var(--text2);min-height:18px;"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">📤 Offline Queue</div>
+    <div id="queue-detail" style="font-size:13px;color:var(--text2);margin-bottom:10px;">No queued entries.</div>
+    <div style="display:flex;gap:8px;">
+      <button class="btn-sm" onclick="flushQueue()">Retry Send Now</button>
+      <button class="btn-sm btn-danger" onclick="clearQueue()">Clear Queue</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">📋 Setup Steps</div>
+    <div style="font-size:13px;line-height:1.8;color:var(--text2);">
+      <div style="margin-bottom:10px;"><span style="background:var(--accent);color:#000;font-weight:700;padding:2px 8px;border-radius:20px;font-size:11px;">1</span> &nbsp;Go to <strong style="color:var(--text);">sheets.google.com</strong> — create a new blank spreadsheet — copy the ID from the URL.</div>
+      <div style="margin-bottom:10px;"><span style="background:var(--accent);color:#000;font-weight:700;padding:2px 8px;border-radius:20px;font-size:11px;">2</span> &nbsp;Go to <strong style="color:var(--text);">script.google.com</strong> → New Project → paste the Apps Script code → replace the Sheet ID.</div>
+      <div style="margin-bottom:10px;"><span style="background:var(--accent);color:#000;font-weight:700;padding:2px 8px;border-radius:20px;font-size:11px;">3</span> &nbsp;Click <strong style="color:var(--text);">Deploy → New Deployment → Web App</strong> → Who has access: <strong style="color:var(--text);">Anyone</strong> → Deploy → copy URL.</div>
+      <div><span style="background:var(--accent);color:#000;font-weight:700;padding:2px 8px;border-radius:20px;font-size:11px;">4</span> &nbsp;Paste the URL above and tap <strong style="color:var(--text);">Save URL</strong>. Done!</div>
+    </div>
+  </div>
+</div></div>
+
+<script>
+const EVENTS=['Puppy','Junior','Senior','Over the Hill','Youth/Female'];
+const SPECIAL=[{k:'treeing',l:'Treeing Contest'},{k:'ironDog',l:'Iron Dog'},{k:'bearDrag',l:'Bear Drag'}];
+const URL_KEY='uha_ipad_url',QUEUE_KEY='uha_ipad_queue',RECENT_KEY='uha_ipad_recent';
+
+// Safe storage: falls back to in-memory if localStorage is blocked (Safari on file://)
+const _memStore={};
+const store={
+  getItem(k){try{return store.getItem(k);}catch(e){return _memStore[k]||null;}},
+  setItem(k,v){try{store.setItem(k,v);}catch(e){_memStore[k]=v;}},
+  removeItem(k){try{store.removeItem(k);}catch(e){delete _memStore[k];}}
+};
+
+// ── HARDCODE YOUR GOOGLE SHEETS URL HERE ──────────────────────────────────────
+// Paste your Apps Script Web App URL between the quotes below and save the file.
+// Once set here, you won't need to enter it in the Setup tab.
+const HARDCODED_URL = 'https://script.google.com/macros/s/AKfycbxg_st10vham2R8l4TcXDejF-r77pOVJ04XE9XPNxdpPPcuOUuAlPe_YG9eh0gHHahooQ/exec';
+// ─────────────────────────────────────────────────────────────────────────────
+
+let scriptUrl=HARDCODED_URL||store.getItem(URL_KEY)||'';
+let queue=JSON.parse(store.getItem(QUEUE_KEY)||'[]');
+let recent=JSON.parse(store.getItem(RECENT_KEY)||'[]');
+let dogCount=1,packCount=0;
+
+function init(){
+  addDog();
+  if(scriptUrl){
+    document.getElementById('su-url').value=scriptUrl;
+    if(HARDCODED_URL){
+      const urlNote=document.getElementById('url-msg');
+      if(urlNote){urlNote.textContent='✓ URL pre-configured in file.';urlNote.style.color='var(--green)';}
+    }
+  }
+  updateQBanner();renderRecent();renderQueueDetail();checkConn();
+  setInterval(checkConn,20000);setInterval(flushQueue,45000);
+}
+
+function switchTab(name,btn){
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');btn.classList.add('active');
+  if(name==='recent')renderRecent();
+}
+
+function checkConn(){
+  const dot=document.getElementById('connDot'),lbl=document.getElementById('connLbl');
+  if(!scriptUrl){dot.className='conn-dot';lbl.textContent='Not configured';return;}
+  if(navigator.onLine){dot.className='conn-dot online';lbl.textContent='Online';flushQueue();}
+  else{dot.className='conn-dot';lbl.textContent='Offline — queuing';}
+}
+window.addEventListener('online',()=>{checkConn();});
+window.addEventListener('offline',checkConn);
+
+function addDog(){
+  const n=dogCount++;
+  const div=document.createElement('div');
+  div.className='dog-block';div.id=`dog-${n}`;
+  div.innerHTML=`<div class="dog-num">Dog #${n}</div>
+    <div class="row" style="margin-bottom:10px;">
+      <div class="fg"><label>Handler's Name</label><input class="fi" id="d${n}-h" placeholder="Handler name" style="font-size:15px;"></div>
+      <div class="fg"><label>Dog's Name *</label><input class="fi" id="d${n}-d" placeholder="Dog name" style="font-size:15px;"></div>
+    </div>
+    <div style="font-size:11px;color:var(--text2);margin-bottom:6px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;">Select Events</div>
+    <div class="dog-events">
+      ${EVENTS.map(ev=>`<label class="dog-ev" onclick="toggleEv(this);calcCost()"><input type="checkbox" value="${ev}"> ${ev}</label>`).join('')}
+      ${SPECIAL.map(sp=>`<label class="dog-ev" onclick="toggleEv(this);calcCost()" style="border-color:rgba(139,92,246,.3);color:var(--text2);"><input type="checkbox" value="${sp.k}"> ${sp.l}</label>`).join('')}
+    </div>
+    ${n>1?`<button class="btn-sm btn-danger" onclick="removeDog(${n})" style="margin-top:10px;font-size:12px;">Remove Dog</button>`:''}`;
+  document.getElementById('dog-list').appendChild(div);
+  if(dogCount>11)document.getElementById('addDogBtn').style.display='none';
+}
+function removeDog(n){const el=document.getElementById(`dog-${n}`);if(el){el.remove();calcCost();}}
+function toggleEv(label){setTimeout(()=>{label.classList.toggle('on',label.querySelector('input').checked);},0);}
+
+function addPack(){
+  if(packCount>=5)return;
+  const n=++packCount;
+  const div=document.createElement('div');
+  div.className='pack-block';div.id=`pack-${n}`;
+  div.innerHTML=`<div class="shdr" style="margin-top:0;">Bear Pack ${n}</div>
+    <div class="row" style="margin-bottom:10px;">
+      <div class="fg"><label>Pack Name *</label><input class="fi" id="p${n}-name" placeholder="e.g. Southern Pack" style="font-size:15px;" oninput="onPackName(${n})"></div>
+      <div class="fg"><label>Pack Owner / Handler</label><input class="fi" id="p${n}-owner" placeholder="Owner name" style="font-size:15px;"></div>
+    </div>
+    <div style="font-size:11px;color:var(--text2);margin-bottom:8px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;">5 Dog Names</div>
+    ${[1,2,3,4,5].map(i=>`<div class="row" style="margin-bottom:8px;">
+      <div class="fg"><label>Dog ${i} Name</label><input class="fi" id="p${n}-dog${i}" placeholder="Dog name" style="font-size:15px;"></div>
+      <div class="fg"><label>Dog ${i} Handler</label><input class="fi" id="p${n}-hd${i}" placeholder="Handler" style="font-size:15px;"></div>
+    </div>`).join('')}
+    <button class="btn-sm btn-danger" onclick="removePack(${n})" style="margin-top:4px;font-size:12px;">Remove Pack ${n}</button>`;
+  document.getElementById('pack-list').appendChild(div);
+  if(packCount>=5)document.getElementById('addPackBtn').style.display='none';
+  calcCost();
+}
+function removePack(n){const el=document.getElementById(`pack-${n}`);if(el){el.remove();packCount=Math.max(0,packCount-1);document.getElementById('addPackBtn').style.display='';calcCost();}}
+function onPackName(n){const el=document.getElementById(`pack-${n}`),v=(document.getElementById(`p${n}-name`)||{}).value||'';if(el)el.classList.toggle('filled',!!v.trim());calcCost();}
+
+function toggleChk(label){setTimeout(()=>{label.classList.toggle('on',label.querySelector('input').checked);},0);}
+
+function calcCost(){
+  const lines=[];let total=0;
+  if(document.getElementById('chk-member').classList.contains('on')){lines.push({l:'UHA Membership',a:35});total+=35;}
+  const gp=parseInt(document.getElementById('f-grand').value)||0;
+  if(gp>0){const pp=gp<5?25:20;const a=gp*pp;lines.push({l:`Grand Prize Raffle (${gp}x $${pp})`,a});total+=a;}
+  const gr=parseInt(document.getElementById('f-general').value)||0;
+  if(gr>0){const a=gr*25;lines.push({l:`General Raffle (${gr} bundle${gr>1?'s':''} x $25)`,a});total+=a;}
+  let pc=0;for(let i=1;i<=5;i++){const el=document.getElementById(`p${i}-name`);if(el&&el.value.trim())pc++;}
+  if(pc>0){lines.push({l:`Five Dog Bear Pack${pc>1?'s':''} (${pc}x $75)`,a:pc*75});total+=pc*75;}
+  document.querySelectorAll('.dog-block').forEach(b=>{
+    const n=b.id.split('-')[1];
+    const dog=(document.getElementById(`d${n}-d`)||{}).value||'';
+    const ons=[...b.querySelectorAll('.dog-ev.on input')].map(i=>i.value);
+    const reg=ons.filter(e=>EVENTS.includes(e)).length;
+    const tc=ons.includes('treeing')?1:0;const bd=ons.includes('bearDrag')?1:0;
+    const a=reg*10+tc*25+bd*30;
+    if(a>0){lines.push({l:`${dog||'Dog'}: ${ons.map(e=>e==='treeing'?'Treeing':e==='ironDog'?'Iron Dog':e==='bearDrag'?'Bear Drag':e).join(', ')}`,a});total+=a;}
+  });
+  const card=document.getElementById('cost-card');
+  if(!lines.length){card.style.display='none';return;}
+  card.style.display='block';
+  document.getElementById('cost-lines').innerHTML=lines.map(l=>`<div class="cost-row"><span>${l.l}</span><span style="font-weight:600;">$${l.a}</span></div>`).join('');
+  document.getElementById('cost-total').textContent=`$${total}`;
+}
+
+function submitForm(){
+  const first=document.getElementById('f-first').value.trim();
+  const last=document.getElementById('f-last').value.trim();
+  const phone=document.getElementById('f-phone').value.trim();
+  if(!first||!last){showMsg('First and last name are required.','err');return;}
+  if(!phone){showMsg('Phone number is required.','err');return;}
+
+  // collect dogs
+  const dogs=[];
+  document.querySelectorAll('.dog-block').forEach(b=>{
+    const n=b.id.split('-')[1];
+    const handler=(document.getElementById(`d${n}-h`)||{}).value.trim()||`${first} ${last}`;
+    const dog=(document.getElementById(`d${n}-d`)||{}).value.trim();
+    if(!dog)return;
+    const ons=[...b.querySelectorAll('.dog-ev.on input')].map(i=>i.value);
+    dogs.push({handler,dog,events:ons.filter(e=>EVENTS.includes(e)).join(', '),treeing:ons.includes('treeing')?'Yes':'',ironDog:ons.includes('ironDog')?'Yes':'',bearDrag:ons.includes('bearDrag')?'Yes':''});
+  });
+
+  // collect packs
+  const packs=[];
+  for(let i=1;i<=5;i++){
+    const nameEl=document.getElementById(`p${i}-name`);if(!nameEl)continue;
+    const pname=nameEl.value.trim();if(!pname)continue;
+    const packDogs=[];
+    for(let d=1;d<=5;d++){
+      const dn=(document.getElementById(`p${i}-dog${d}`)||{}).value.trim();
+      const dh=(document.getElementById(`p${i}-hd${d}`)||{}).value.trim();
+      if(dn)packDogs.push({dog:dn,handler:dh||handler});
+    }
+    packs.push({name:pname,owner:(document.getElementById(`p${i}-owner`)||{}).value.trim()||`${first} ${last}`,dogs:packDogs});
+  }
+
+  const entry={
+    timestamp:new Date().toISOString(),id:'W'+Date.now(),
+    firstName:first,lastName:last,fullName:`${first} ${last}`,
+    street:document.getElementById('f-street').value.trim(),
+    city:document.getElementById('f-city').value.trim(),
+    state:document.getElementById('f-state').value.trim(),
+    zip:document.getElementById('f-zip').value.trim(),
+    email:document.getElementById('f-email').value.trim(),
+    phone,
+    membership:document.getElementById('chk-member').classList.contains('on')?'Y':'',
+    grandRaffle:document.getElementById('f-grand').value||'0',
+    generalRaffle:document.getElementById('f-general').value||'0',
+    notes:document.getElementById('f-notes').value.trim(),
+    dogs,packs,dogCount:dogs.length,packCount:packs.length,
+  };
+
+  const btn=document.getElementById('submitBtn');
+  btn.disabled=true;btn.textContent='Submitting...';
+
+  sendEntry(entry).then(ok=>{
+    btn.disabled=false;btn.textContent='✓ Submit Registration';
+    if(ok)showMsg(`✓ ${first} ${last} registered and sent to Sheets!`,'ok');
+    else{queue.push(entry);saveQueue();updateQBanner();renderQueueDetail();showMsg(`📤 Saved offline — will send when WiFi returns.`,'queued');}
+    recent.unshift({...entry,_sent:ok});
+    if(recent.length>30)recent.pop();
+    store.setItem(RECENT_KEY,JSON.stringify(recent));
+    clearForm();calcCost();
+  });
+}
+
+function sendEntry(entry){
+  if(!scriptUrl||!navigator.onLine)return Promise.resolve(false);
+  document.getElementById('connDot').className='conn-dot sending';
+  return fetch(scriptUrl,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(entry)})
+    .then(()=>{document.getElementById('connDot').className='conn-dot online';return true;})
+    .catch(()=>{document.getElementById('connDot').className='conn-dot';return false;});
+}
+
+function saveQueue(){store.setItem(QUEUE_KEY,JSON.stringify(queue));}
+function updateQBanner(){const b=document.getElementById('qBanner'),c=document.getElementById('qCount');if(queue.length){b.classList.remove('hidden');c.textContent=`${queue.length} entr${queue.length===1?'y':'ies'} queued`;}else b.classList.add('hidden');}
+function flushQueue(){
+  if(!queue.length||!scriptUrl||!navigator.onLine)return;
+  const send=[...queue];queue=[];saveQueue();updateQBanner();renderQueueDetail();
+  Promise.all(send.map(e=>sendEntry(e))).then(res=>{
+    const failed=send.filter((_,i)=>!res[i]);
+    if(failed.length){queue=[...queue,...failed];saveQueue();updateQBanner();renderQueueDetail();}
+    else showMsg(`✓ ${send.length} queued entr${send.length===1?'y':'ies'} sent!`,'ok');
+  });
+}
+function clearQueue(){if(confirm('Clear all queued entries?')){queue=[];saveQueue();updateQBanner();renderQueueDetail();}}
+function renderQueueDetail(){const el=document.getElementById('queue-detail');if(el)el.textContent=queue.length?`${queue.length} entr${queue.length===1?'y':'ies'} waiting to send.`:'No queued entries.';}
+
+function renderRecent(){
+  const el=document.getElementById('recent-list'),cnt=document.getElementById('recent-count');
+  if(cnt)cnt.textContent=recent.length;
+  if(!el)return;
+  if(!recent.length){el.innerHTML='<p style="color:var(--text2);font-size:13px;">No registrations yet.</p>';return;}
+  el.innerHTML=recent.map(r=>{
+    const t=new Date(r.timestamp).toLocaleString([],{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
+    const ds=r.dogs.map(d=>`${d.dog} (${[d.events,d.treeing?'Treeing':'',d.ironDog?'Iron Dog':'',d.bearDrag?'Bear Drag':''].filter(Boolean).join(', ')||'—'})`).join('; ');
+    const ps=r.packs&&r.packs.length?r.packs.map(p=>p.name).join(', '):'';
+    return`<div class="recent-item"><div class="rdot ${r._sent?'':'pend'}"></div><div style="flex:1;min-width:0;">
+      <div style="font-size:14px;font-weight:700;">${r.fullName}</div>
+      <div style="font-size:11px;color:var(--text2);margin-top:2px;">${t} · ${r.phone}</div>
+      ${ds?`<div style="font-size:11px;color:var(--text2);margin-top:3px;">🐕 ${ds}</div>`:''}
+      ${ps?`<div style="font-size:11px;color:var(--purple);margin-top:2px;">🐻 Bear Pack: ${ps}</div>`:''}
+      ${!r._sent?'<div style="font-size:11px;color:var(--accent);margin-top:2px;">📤 Queued — not yet sent</div>':''}
+    </div></div>`;
+  }).join('');
+}
+function clearRecent(){if(confirm('Clear recent list?')){recent=[];store.setItem(RECENT_KEY,'[]');renderRecent();}}
+
+function clearForm(){
+  ['f-first','f-last','f-street','f-city','f-state','f-zip','f-email','f-phone','f-grand','f-general','f-notes'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('chk-member').classList.remove('on');
+  document.getElementById('f-member').checked=false;
+  document.getElementById('dog-list').innerHTML='';dogCount=1;
+  document.getElementById('addDogBtn').style.display='';addDog();
+  document.getElementById('pack-list').innerHTML='';packCount=0;
+  document.getElementById('addPackBtn').style.display='';
+  document.getElementById('f-first').focus();
+}
+
+function saveUrl(){
+  const v=document.getElementById('su-url').value.trim();
+  if(!v||!v.startsWith('http')){setUrlMsg('Enter a valid URL.','red');return;}
+  scriptUrl=v;store.setItem(URL_KEY,v);setUrlMsg('✓ URL saved!','green');checkConn();
+}
+function testConn(){
+  if(!scriptUrl){setUrlMsg('Save a URL first.','orange');return;}
+  setUrlMsg('Testing...','var(--text2)');
+  fetch(scriptUrl+'?action=ping').then(()=>setUrlMsg('✓ Connected!','green')).catch(()=>setUrlMsg('Could not connect — check URL and WiFi.','red'));
+}
+function setUrlMsg(t,c){const el=document.getElementById('url-msg');if(el){el.textContent=t;el.style.color=c==='green'?'var(--green)':c==='red'?'var(--red)':'var(--text2)';}}
+
+function showMsg(text,type){
+  const el=document.getElementById('msg');el.textContent=text;el.className=`msg ${type}`;el.style.display='block';
+  window.scrollTo({top:0,behavior:'smooth'});
+  if(type!=='err')setTimeout(()=>{el.style.display='none';},7000);
+}
+
+init();
+</script>
+</body>
+</html>
