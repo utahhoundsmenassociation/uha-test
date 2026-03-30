@@ -115,14 +115,21 @@ textarea.fi{min-height:70px;resize:vertical;font-size:15px;}
 </div>
 
 <div class="card">
-  <div class="card-title">Five Dog Bear Pack &nbsp;<span style="font-size:12px;font-weight:400;color:var(--text2);">$75 per pack</span></div>
+  <div class="card-title">🪪 UHA Membership</div>
+  <div style="font-size:13px;color:var(--text2);margin-bottom:12px;line-height:1.5;">Add members purchasing a UHA membership. Click to add each person — multiple members can be added under one registration.</div>
+  <div id="ipad-mem-list"></div>
+  <button class="btn-sm" onclick="ipadAddMember()" id="addMemBtn">+ Add Member</button>
+</div>
+
+<div class="card">
+  <div class="card-title">Five Dog Bear Pack</div>
   <div style="font-size:13px;color:var(--text2);margin-bottom:12px;line-height:1.5;">All 5 dogs must cross and tree to qualify. Fastest time wins. Register up to 5 packs.</div>
   <div id="pack-list"></div>
   <button class="btn-sm" onclick="addPack()" id="addPackBtn">+ Register a Bear Pack</button>
 </div>
 
 <div class="card">
-  <div class="card-title">🐕 Dog Registration &nbsp;<span style="font-size:12px;font-weight:400;color:var(--text2);">$10/class · Treeing $25 · Bear Drag $30</span></div>
+  <div class="card-title">🐕 Dog Registration</div>
   <div style="font-size:12px;color:var(--text2);margin-bottom:10px;line-height:1.7;">
     <strong style="color:var(--text);">Puppy</strong> — under 1 yr &nbsp;|&nbsp; <strong style="color:var(--text);">Junior</strong> — never trophied in UHA &nbsp;|&nbsp; <strong style="color:var(--text);">Senior</strong> — any dog<br>
     <strong style="color:var(--text);">Over the Hill</strong> — 8+ yrs &nbsp;|&nbsp; <strong style="color:var(--text);">Youth/Female</strong> — under 16, female, or MOH approved<br>
@@ -237,6 +244,32 @@ function addDog(){
 function removeDog(n){const el=document.getElementById(`dog-${n}`);if(el)el.remove();}
 function toggleEv(label){setTimeout(()=>{label.classList.toggle('on',label.querySelector('input').checked);},0);}
 
+let ipadMemCount=0;
+function ipadAddMember(){
+  ipadMemCount++;
+  const n=ipadMemCount;
+  const div=document.createElement('div');
+  div.id=`ipad-mem-${n}`;
+  div.style.cssText='display:flex;gap:8px;margin-bottom:10px;align-items:flex-end;';
+  div.innerHTML=`
+    <div class="fg"><label>First Name</label><input class="fi" id="im-f${n}" placeholder="First" style="font-size:16px;"></div>
+    <div class="fg"><label>Last Name</label><input class="fi" id="im-l${n}" placeholder="Last" style="font-size:16px;"></div>
+    <button onclick="document.getElementById('ipad-mem-${n}').remove()" style="background:none;border:1.5px solid #e5e7eb;border-radius:10px;padding:12px 14px;cursor:pointer;color:#ef4444;font-size:18px;flex-shrink:0;margin-bottom:1px;">✕</button>`;
+  document.getElementById('ipad-mem-list').appendChild(div);
+  document.getElementById(`im-f${n}`).focus();
+}
+function collectIpadMembers(){
+  const members=[];
+  document.querySelectorAll('#ipad-mem-list > div').forEach(div=>{
+    const id=div.id.replace('ipad-mem-','');
+    const f=(document.getElementById(`im-f${id}`)||{}).value||'';
+    const l=(document.getElementById(`im-l${id}`)||{}).value||'';
+    const name=(f.trim()+' '+l.trim()).trim();
+    if(name)members.push(name);
+  });
+  return members;
+}
+
 function addPack(){
   if(packCount>=5)return;
   const n=++packCount;
@@ -245,13 +278,13 @@ function addPack(){
   div.innerHTML=`<div class="shdr" style="margin-top:0;">Bear Pack ${n}</div>
     <div class="row" style="margin-bottom:10px;">
       <div class="fg"><label>Pack Name *</label><input class="fi" id="p${n}-name" placeholder="e.g. Southern Pack" style="font-size:15px;" oninput="onPackName(${n})"></div>
-      <div class="fg"><label>Pack Owner / Handler</label><input class="fi" id="p${n}-owner" placeholder="Owner name" style="font-size:15px;"></div>
     </div>
     <div style="font-size:11px;color:var(--text2);margin-bottom:8px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;">5 Dog Names</div>
-    ${[1,2,3,4,5].map(i=>`<div class="row" style="margin-bottom:8px;">
-      <div class="fg"><label>Dog ${i} Name</label><input class="fi" id="p${n}-dog${i}" placeholder="Dog name" style="font-size:15px;"></div>
-      <div class="fg"><label>Dog ${i} Handler</label><input class="fi" id="p${n}-hd${i}" placeholder="Handler" style="font-size:15px;"></div>
-    </div>`).join('')}
+    <div class="row" style="margin-bottom:8px;"><div class="fg"><label>Dog 1 Name</label><input class="fi" id="p${n}-dog1" placeholder="Dog name" style="font-size:15px;"></div></div>
+    <div class="row" style="margin-bottom:8px;"><div class="fg"><label>Dog 2 Name</label><input class="fi" id="p${n}-dog2" placeholder="Dog name" style="font-size:15px;"></div></div>
+    <div class="row" style="margin-bottom:8px;"><div class="fg"><label>Dog 3 Name</label><input class="fi" id="p${n}-dog3" placeholder="Dog name" style="font-size:15px;"></div></div>
+    <div class="row" style="margin-bottom:8px;"><div class="fg"><label>Dog 4 Name</label><input class="fi" id="p${n}-dog4" placeholder="Dog name" style="font-size:15px;"></div></div>
+    <div class="row" style="margin-bottom:8px;"><div class="fg"><label>Dog 5 Name</label><input class="fi" id="p${n}-dog5" placeholder="Dog name" style="font-size:15px;"></div></div>
     <button class="btn-sm btn-danger" onclick="removePack(${n})" style="margin-top:4px;font-size:12px;">Remove Pack ${n}</button>`;
   document.getElementById('pack-list').appendChild(div);
   if(packCount>=5)document.getElementById('addPackBtn').style.display='none';
@@ -290,10 +323,9 @@ function submitForm(){
     const packDogs=[];
     for(let d=1;d<=5;d++){
       const dn=(document.getElementById(`p${i}-dog${d}`)||{}).value.trim();
-      const dh=(document.getElementById(`p${i}-hd${d}`)||{}).value.trim();
-      if(dn)packDogs.push({dog:dn,handler:dh||`${first} ${last}`});
+      if(dn)packDogs.push({dog:dn,handler:`${first} ${last}`});
     }
-    packs.push({name:pname,owner:(document.getElementById(`p${i}-owner`)||{}).value.trim()||`${first} ${last}`,dogs:packDogs});
+    packs.push({name:pname,owner:`${first} ${last}`,dogs:packDogs});
   }
 
   const entry={
@@ -307,6 +339,7 @@ function submitForm(){
     phone,
     notes:document.getElementById('f-notes').value.trim(),
     dogs,packs,dogCount:dogs.length,packCount:packs.length,
+    members:collectIpadMembers(),
   };
 
   const btn=document.getElementById('submitBtn');
@@ -442,6 +475,8 @@ function clearRecent(){if(confirm('Clear recent list?')){recent=[];localStorage.
 function clearForm(){
   ['f-first','f-last','f-street','f-city','f-state','f-zip','f-email','f-phone','f-notes'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   
+  document.getElementById('ipad-mem-list').innerHTML='';
+  ipadMemCount=0;
   document.getElementById('dog-list').innerHTML='';dogCount=1;
   document.getElementById('addDogBtn').style.display='';addDog();
   document.getElementById('pack-list').innerHTML='';packCount=0;
